@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!--<context:annotation-config/>-->
+    <context:component-scan base-package="net.xinqushi"/>
+    <context:property-placeholder location="db.properties"/>
+
+    <!--<context:component-scan base-package="default"/>-->
+    <!--<bean id="person" class="Person">-->
+        <!--<property name="name" value="zhangsan"/>-->
+    <!--</bean>-->
+    <bean class="Config"/>
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driverClassName}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+     </bean>
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+
+    <bean id="userMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+        <property name="mapperInterface" value="net.xinqushi.mapper.UserMapper"/>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+    </bean>
+
+
+    <aop:aspectj-autoproxy/>
+
+    <bean id="girl" class="net.xinqushi.aoptest.Girl"/>
+    <bean id="boy" class="net.xinqushi.aoptest.Boy"/>
+    <bean id="otherfuc" class="net.xinqushi.aoptest.Otherfuc"/>
+    
+    <aop:config>
+        <aop:aspect ref="otherfuc">
+            <aop:pointcut id="ponit1" expression="execution(* net.xinqushi.aoptest..sleep(..))"/>
+            <aop:before pointcut-ref="ponit1" method="bfsleep" />
+        </aop:aspect>
+    </aop:config>
+
+</beans>
